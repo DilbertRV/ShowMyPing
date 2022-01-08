@@ -106,7 +106,7 @@ namespace ShowMyPing
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(297, 146);
             this.Name = "CustomAddressForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Enter Custom Host Address";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();

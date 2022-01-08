@@ -16,6 +16,8 @@ namespace ShowMyPing
         public CustomAddressForm()
         {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - this.Width, Screen.PrimaryScreen.WorkingArea.Height - this.Height);
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
