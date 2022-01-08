@@ -78,10 +78,12 @@ namespace ShowMyPing
             // 
             this.txtCustomAddress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtCustomAddress.Location = new System.Drawing.Point(44, 41);
+            this.txtCustomAddress.MaxLength = 100;
             this.txtCustomAddress.Name = "txtCustomAddress";
             this.txtCustomAddress.Size = new System.Drawing.Size(198, 20);
             this.txtCustomAddress.TabIndex = 1;
             this.txtCustomAddress.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtCustomAddress.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtCustomAddress_KeyDown);
             // 
             // txtTitle
             // 

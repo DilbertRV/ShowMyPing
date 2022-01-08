@@ -29,5 +29,13 @@ namespace ShowMyPing
         {
             this.Close();
         }
+
+        private void txtCustomAddress_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnConfirm_Click(this, new EventArgs());
+            }
+        }
     }
 }

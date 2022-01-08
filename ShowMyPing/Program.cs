@@ -139,6 +139,7 @@ namespace ShowMyPing
         private void OpenCustomAddressForm(object sender, EventArgs e)
         {
             defaultAddress.Checked = false;
+            customAddress.Enabled = false;
             form.ShowDialog();
             if (form.customAddress != null)
             {
@@ -147,6 +148,7 @@ namespace ShowMyPing
             }
             else
                 defaultAddress.Checked = true;
+            customAddress.Enabled = true;
             notifyIcon.Text = "Show My Ping" + "\n" + ping;
         }
 
