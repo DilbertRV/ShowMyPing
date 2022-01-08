@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShowMyPing", "ShowMyPing\ShowMyPing.csproj", "{90D22C62-1B30-402F-823A-A353D265E415}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{90D22C62-1B30-402F-823A-A353D265E415}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90D22C62-1B30-402F-823A-A353D265E415}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90D22C62-1B30-402F-823A-A353D265E415}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90D22C62-1B30-402F-823A-A353D265E415}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {679611C9-CACB-4401-89F9-890450B47841}
+	EndGlobalSection
+EndGlobal
