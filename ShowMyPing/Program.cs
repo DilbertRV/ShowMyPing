@@ -103,6 +103,7 @@ namespace ShowMyPing
                defaultAddress.Checked = !defaultAddress.Checked;
             if (defaultAddress.Checked)
             {
+                form.customAddress = null;
                 ping = "8.8.8.8";
                 customAddress.Checked = false;
             }
