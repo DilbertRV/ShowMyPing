@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>C:\Users\Dilbert\source\repos\ShowMyPing\ShowMyPing\resources\ShowMyPing.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
