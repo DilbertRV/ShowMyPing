@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ShowMyPing
@@ -30,6 +32,7 @@ namespace ShowMyPing
         private string averagePing;
         List<string> pingData = new List<string>();
         List<int> pingDataInt = new List<int>();
+        List<PingReply> listaNueva = new List<PingReply>();
 
         private ToolStripMenuItem defaultAddress;
         private ToolStripMenuItem customAddress;
@@ -170,49 +173,19 @@ namespace ShowMyPing
             notifyIcon.MouseClick += ShowLatency;
         }
 
-        public void PingTimeAverage()
+        private async Task<List<PingReply>> PingAsync()
         {
-            try
-            {
-                Ping pingClass = new Ping();
 
-                PingReply pingReply = pingClass.Send(ping);
-                pingData.Add(pingReply.RoundtripTime.ToString() + "ms");
-                pingDataInt.Add(((int)pingReply.RoundtripTime));
+            Ping pingClass = new Ping();
 
-                current++;
+            var tasks = pingClass.SendPingAsync(ping, 2000);
 
-                for (int i = 0; i < pingData.Count; i++)
-                    notifyIcon.Text = (pingData[i]);
+            var results = await Task.WhenAll(tasks);
 
-                if (current == 4)
-                {
-                    pingTimer.Stop();
-                    pingTimer.Tick -= ObservePingTick;
-                    current = 0;
+            current++;
 
-                    CalculatingAverage();
-                    string Data = string.Join(" - ", pingData);
-
-                    notifyIcon.BalloonTipTitle = "Pinging " + ping;
-                    notifyIcon.BalloonTipText = "Ping: " + Data + "\n" + "Average: " + averagePing;
-
-                    notifyIcon.Text = "Show My Ping" + "\n" + ping;
-
-                    notifyIcon.ShowBalloonTip(5000);
-                    pingData.Clear();
-                    pingDataInt.Clear();
-                }
-            }
-            catch (PingException e)
-            {
-                pingTimer.Stop();
-                pingTimer.Tick -= ObservePingTick;
-                current = 0;
-                MessageBox.Show(e.Message + "\nCheck the address and enter a valid one." + "\nAddress: " + ping, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            
-        }
+            return results.ToList();
+        }  
 
         public void CalculatingAverage()
         {
@@ -225,9 +198,117 @@ namespace ShowMyPing
             averagePing = (sum / 4).ToString() + "ms";
         }
 
-        private void ObservePingTick(object sender, EventArgs e)
+        private async void ObservePingTick(object sender, EventArgs e)
         {
-            PingTimeAverage();
+            try
+            {
+                await FillListWithPingInformation();
+            }
+            catch (PingException p)
+            {
+                pingTimer.Stop();
+                pingTimer.Tick -= ObservePingTick;
+                current = 0;
+                MessageBox.Show("\nAn error occurred, the application will be restarted. " +
+                    "If the error persists please create an issue on the project page on GitHub." + "\nAddress: " + ping, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (MessageBox.Show("¿Would you like to be redirected to the repository of this project and create an issue?", "Visit", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                {
+                    Process.Start("https://github.com/DilbertRV/ShowMyPing/issues");
+                }
+                Application.Restart();
+            }
+        }
+
+        public async Task FillListWithPingInformation()
+        {
+            if (!(current == 4))
+            {
+                Task<List<PingReply>> longRunningTask = PingAsync();
+                listaNueva = await longRunningTask;
+                foreach (PingReply ping in listaNueva)
+                {
+
+                    if (ping.Status == IPStatus.Success)
+                    {
+                        pingData.Add(ping.RoundtripTime.ToString() + "ms");
+                        pingDataInt.Add((int)ping.RoundtripTime);
+                    }
+                    else
+                    {
+                        if (ping.Status == IPStatus.TimedOut)
+                        {
+                            pingData.Add("Timeout");
+                            pingDataInt.Add(((int)ping.RoundtripTime));
+                        }
+                        else if (ping.Status == IPStatus.TimeExceeded)
+                        {
+                            pingData.Add("Time Exceeded");
+                            pingDataInt.Add(((int)ping.RoundtripTime));
+                        }
+                        else if (ping.Status == IPStatus.DestinationHostUnreachable)
+                        {
+                            pingData.Add("Host Unreachable");
+                            pingDataInt.Add(((int)ping.RoundtripTime));
+                        }
+                        else if (ping.Status == IPStatus.DestinationNetworkUnreachable)
+                        {
+                            pingData.Add("Network Error");
+                            pingDataInt.Add(((int)ping.RoundtripTime));
+                        }
+                    }  
+                }
+            }
+            else
+            {
+                pingTimer.Stop();
+                pingTimer.Tick -= ObservePingTick;
+                current = 0;
+
+                int count = 0;
+                for (int i = 0; i < pingData.Count; i++)
+                {
+                    if (!(pingData[i].Contains("ms")))
+                    {
+                        count++;
+                    }
+                }
+                if (!(count == 4))
+                {
+                    if (count > 0)
+                    {
+                        CalculatingAverage();
+                        string Data = string.Join(" - ", pingData);
+                        notifyIcon.BalloonTipTitle = "Pinging " + ping;
+                        notifyIcon.BalloonTipText = "Ping: " + Data + "\n" + "Average: " + averagePing + " * with packet loss or connection problems.";
+                        notifyIcon.Text = "Show My Ping" + "\n" + ping;
+                        notifyIcon.ShowBalloonTip(5000);
+                        pingData.Clear();
+                        pingDataInt.Clear();
+                    }
+                    else
+                    {
+                        CalculatingAverage();
+                        string Data = string.Join(" - ", pingData);
+                        notifyIcon.BalloonTipTitle = "Pinging " + ping;
+                        notifyIcon.BalloonTipText = "Ping: " + Data + "\n" + "Average: " + averagePing;
+                        notifyIcon.Text = "Show My Ping" + "\n" + ping;
+                        notifyIcon.ShowBalloonTip(5000);
+                        pingData.Clear();
+                        pingDataInt.Clear();
+                    }   
+                }
+                else
+                {
+                    string Data = string.Join(" - ", pingData);
+                    notifyIcon.BalloonTipTitle = "Pinging " + ping;
+                    notifyIcon.BalloonTipText = "Ping: " + Data + "\n" + "There was no response or there is a problem with your connection: \n" 
+                        + "Read the ping responses to see the problem.";
+                    notifyIcon.Text = "Show My Ping" + "\n" + ping;
+                    notifyIcon.ShowBalloonTip(5000);
+                    pingData.Clear();
+                    pingDataInt.Clear();
+                }                
+            }
         }
 
         private void StartObservePing() 
